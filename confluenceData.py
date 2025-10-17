@@ -1,4 +1,8 @@
 from confluenceConnection import ConfluenceClient
+from utils import extractTextFromHtml
+import pandas as pd
+import os
+from config import OUTPUT_DIR
 
 class ConfluenceCrawler:
     def __init__(self):
@@ -13,13 +17,21 @@ class ConfluenceCrawler:
 
         pageData = self.client.getPage(pageId)
         title = pageData.get("title")
-        body_html = pageData.get("body", {}).get("storage", {}).get("value", "")
+        bodyHtml = pageData.get("body", {}).get("storage", {}).get("value", "")
         print("  " * depth + f"📄 {title}")
-
-        # Save or process data (store in DB, file, etc.)
-        # Example: save to a dictionary or JSON
+        print("Extracting text from page:", title)
+        bodyText = extractTextFromHtml(bodyHtml)
+        
+        os.makedirs(OUTPUT_DIR, exist_ok=True)
+        filePath = os.path.join(OUTPUT_DIR, f"{title}.txt")
+        
+        with open(filePath, "w", encoding="utf-8") as f:
+            f.write(bodyText)
+            
+        print(f"✅ Page '{title}' saved to:\n - {filePath}")
 
         children = pageData.get("children", {}).get("page", {}).get("results", [])
         for child in children:
             childId = child["id"]
-            self.crawl_page(childId, depth + 1)
+            self.crawlPage(childId, depth + 1)
+     
