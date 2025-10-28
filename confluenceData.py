@@ -1,6 +1,5 @@
 from confluenceConnection import ConfluenceClient
 from utils import extractTextFromHtml
-import pandas as pd
 import os
 from config import OUTPUT_DIR
 
@@ -9,7 +8,7 @@ class ConfluenceCrawler:
         self.client = ConfluenceClient()
         self.visited = set()
 
-    def crawlPage(self, pageId, depth=0):
+    def crawlPage(self, pageId, sectionName, depth=0):
         """Recursively crawl a Confluence page and its children"""
         if pageId in self.visited:
             return
@@ -19,9 +18,10 @@ class ConfluenceCrawler:
         title = pageData.get("title")
         bodyHtml = pageData.get("body", {}).get("storage", {}).get("value", "")
         print("  " * depth + f"📄 {title}")
-        print("Extracting text from page:", title)
-        bodyText = extractTextFromHtml(bodyHtml)
         
+        print(f"Extracting section '{sectionName}' from page: {title}")
+        bodyText = self.client.extract_section(bodyHtml, sectionName)     
+
         os.makedirs(OUTPUT_DIR, exist_ok=True)
         filePath = os.path.join(OUTPUT_DIR, f"{title}.txt")
         

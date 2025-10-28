@@ -1,16 +1,15 @@
 from confluenceData import ConfluenceCrawler
 from summarization import summarization
 from config import START_PAGE_ID, OUTPUT_DIR
-#from summarize import summarize
 import os
 
 if __name__ == "__main__":
     print("Starting python code...\n")
+    sectionName = input("Enter the section you want to fetch from the page: ")
     crawler = ConfluenceCrawler()
     print("Starting crawl...\n")
-    crawler.crawlPage(START_PAGE_ID)
+    crawler.crawlPage(START_PAGE_ID, sectionName)
     print("\nCrawl complete!")
-    print("Starting summarization...\n")
     try:
         files = [f for f in os.listdir(OUTPUT_DIR) if f.endswith(".txt")]
     except FileNotFoundError:
@@ -25,7 +24,6 @@ if __name__ == "__main__":
     for filename in files:
         filepath = os.path.join(OUTPUT_DIR, filename)
         print(f"Summarizing file: {filepath}")
-        #summary = summarize.summarize_file(filepath)
         summary = summarization.summarize_file(filepath)
         print("Summarization complete!\n")
         print(f"Summary:\n {summary}")
