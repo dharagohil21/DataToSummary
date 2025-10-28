@@ -1,6 +1,7 @@
 from config import CHUNK_TOKENS, OVERLAP_TOKENS, MODEL
 try:
     import tiktoken
+    # retrieve the appropriate tiktoken encoding object for the specified model 
     TOK = tiktoken.encoding_for_model(MODEL)
 except Exception:
     TOK = None
